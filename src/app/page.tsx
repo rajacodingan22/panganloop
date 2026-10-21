@@ -1,5 +1,6 @@
 import { Hero } from "./_components/hero";
 import { HowItWorks } from "./_components/how-it-works";
+import { ImpactSection } from "./_components/impact-section";
 import { InfoDialog } from "./_components/info-dialog";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
@@ -22,6 +23,7 @@ export default function Home() {
         <ValuesStrip />
         <SurplusSection />
         <HowItWorks />
+        <ImpactSection />
       </main>
 
       <SiteFooter />

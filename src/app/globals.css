@@ -2185,6 +2185,370 @@ h1 span {
   }
 }
 
+/* ---------- Transparansi Dampak ---------- */
+
+.imp {
+  position: relative;
+  padding: clamp(48px, 5.5vw, 80px) 0;
+  background:
+    radial-gradient(800px 400px at 100% 0%, rgba(197, 214, 190, 0.22), transparent 60%),
+    var(--cream-soft);
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+/* Header */
+.imp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.imp-eyebrow {
+  color: var(--green-700);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.imp-header h2 {
+  margin-top: 8px;
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.imp-sub {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.imp-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  padding-top: 6px;
+}
+
+.imp-date-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.imp-date-pill .icon {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+.imp-date-caret {
+  width: 13px !important;
+  height: 13px !important;
+  opacity: 0.45;
+  transform: rotate(90deg);
+}
+
+.imp-demo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.imp-demo-btn:hover {
+  background: var(--cream);
+  border-color: rgba(13, 53, 39, 0.2);
+}
+
+.imp-demo-btn .icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.5;
+}
+
+/* Stat cards */
+.imp-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: clamp(24px, 3vw, 36px);
+}
+
+.imp-stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 16px;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 4px 16px -8px rgba(13, 53, 39, 0.1);
+}
+
+.imp-stat--warn {
+  border-color: rgba(240, 170, 62, 0.35);
+  background: rgba(255, 253, 248, 0.9);
+}
+
+.imp-stat-icon-wrap {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: var(--green-100);
+  color: var(--green-700);
+}
+
+.imp-stat-icon-wrap--warn {
+  background: rgba(240, 170, 62, 0.16);
+  color: #b07a14;
+}
+
+.imp-stat-icon,
+.imp-stat-icon--check {
+  width: 20px;
+  height: 20px;
+}
+
+.imp-stat-body {
+  min-width: 0;
+}
+
+.imp-stat-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.imp-stat-value {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.4vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.imp-stat--warn .imp-stat-value {
+  color: #c17d0f;
+}
+
+.imp-stat-unit {
+  font-size: 0.55em;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--muted);
+  vertical-align: baseline;
+}
+
+.imp-stat-desc {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* Chart + legend row */
+.imp-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.imp-chart-panel,
+.imp-guide-panel {
+  padding: 20px 20px 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 4px 16px -8px rgba(13, 53, 39, 0.08);
+}
+
+.imp-chart-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.imp-chart-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.imp-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.imp-chart-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: none;
+}
+
+.imp-chart-dot--listed {
+  background: #a8c5a0;
+}
+
+.imp-chart-dot--rescued {
+  background: #2c7a57;
+}
+
+.imp-chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  font-family: var(--font-body);
+}
+
+/* Guide panel */
+.imp-guide-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+
+.imp-guide-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.imp-guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.imp-guide-icon-wrap {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--green-100);
+  color: var(--green-700);
+}
+
+.imp-legend-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.imp-guide-term {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.imp-guide-desc {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Footnote */
+.imp-footnote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.imp-footnote .icon {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  opacity: 0.55;
+}
+
+.imp-footnote-right {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--green-700);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 1040px) {
+  .imp-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .imp-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .imp-header {
+    flex-direction: column;
+  }
+
+  .imp-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .imp-header-actions {
+    flex-wrap: wrap;
+  }
+
+  .imp-footnote {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .imp-footnote-right {
+    margin-left: 0;
+  }
+}
+
 /* ---------- Cara kerja ---------- */
 
 .how {
