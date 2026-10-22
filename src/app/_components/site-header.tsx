@@ -68,8 +68,11 @@ export function SiteHeader() {
           <Link className="nav-link" href="/#surplus">
             Surplus aktif
           </Link>
-          <Link className="nav-link" href="/#dampak">
-            Dampak
+          <Link className="nav-link" href="/komunitas">
+            Portal Komunitas
+          </Link>
+          <Link className="nav-link" href="/dashboard">
+            Dashboard
           </Link>
         </nav>
 
@@ -110,10 +113,17 @@ export function SiteHeader() {
             </Link>
             <Link
               className="mobile-link"
-              href="/#dampak"
+              href="/komunitas"
               onClick={() => setMenuOpen(false)}
             >
-              Dampak
+              Portal Komunitas
+            </Link>
+            <Link
+              className="mobile-link"
+              href="/dashboard"
+              onClick={() => setMenuOpen(false)}
+            >
+              Dashboard Donor
             </Link>
           </nav>
           <div className="mobile-actions">

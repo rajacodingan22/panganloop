@@ -31,6 +31,18 @@ export const DEMO_ACCOUNTS: UserProfile[] = [
     approved: true,
   },
   {
+    id: "usr-recipient-1",
+    name: "Komunitas Berbagi Pangan",
+    email: "komunitas@panganloop.id",
+    role: "recipient",
+    roleLabel: "Penerima",
+    orgType: "Organisasi Food Rescue Komunitas",
+    pic: "Ahmad Fauzi",
+    phone: "0812-9988-7711",
+    address: "Jl. Kramat Raya No. 12, Jakarta Pusat",
+    approved: true,
+  },
+  {
     id: "usr-donor-user",
     name: "Dapur Mandiri (Akun Anda)",
     email: "opower5431@gmail.com",
@@ -43,7 +55,7 @@ export const DEMO_ACCOUNTS: UserProfile[] = [
     approved: true,
   },
   {
-    id: "usr-recipient-1",
+    id: "usr-recipient-2",
     name: "Yayasan Kasih Peduli",
     email: "kasihpeduli@panganloop.id",
     role: "recipient",

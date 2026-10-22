@@ -171,7 +171,7 @@ export function LoginView() {
                     <span>Pilih Akun Demo:</span>
                     <span className="text-[10px] text-[#1c6b4f] font-semibold">1-Klik Isi Otomatis</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <button
                       type="button"
                       onClick={() => {
@@ -186,7 +186,25 @@ export function LoginView() {
                     >
                       <div className="font-bold leading-tight">Dapur Pagi</div>
                       <div className={`text-[10px] ${email === "dapurpagi@panganloop.id" ? "text-[#c2dfd3]" : "text-[#5e6f64]"}`}>
-                        Donor (Restoran/Bakery)
+                        Donor (Penyedia)
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmail("komunitas@panganloop.id");
+                        setPassword("password123");
+                      }}
+                      className={`p-2.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${
+                        email === "komunitas@panganloop.id"
+                          ? "bg-[#1c5c43] text-white border-[#1c5c43] font-bold shadow-sm"
+                          : "bg-white text-[#0d3527] border-[#d8d0bf] hover:bg-white/80"
+                      }`}
+                    >
+                      <div className="font-bold leading-tight">Komunitas Pangan</div>
+                      <div className={`text-[10px] ${email === "komunitas@panganloop.id" ? "text-[#c2dfd3]" : "text-[#5e6f64]"}`}>
+                        Penerima (Komunitas)
                       </div>
                     </button>
 

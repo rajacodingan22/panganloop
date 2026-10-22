@@ -25,8 +25,11 @@ import {
   TrendingUp,
   User,
   X,
+  RefreshCw,
 } from "lucide-react";
-import { useAuth } from "../_components/auth-context";
+import { useAuth, DEMO_ACCOUNTS } from "../_components/auth-context";
+import { ReservasiView } from "../reservasi/reservasi-view";
+import { RecipientDashboardView } from "../_components/recipient-dashboard-view";
 
 export type TabKey = "ringkasan" | "batch" | "reservasi" | "insight" | "profil";
 export type BatchStatus = "Semua" | "Draft" | "Dipublikasikan" | "Selesai";
@@ -42,16 +45,6 @@ export type BatchItem = {
   surplus: number;
   image: string;
   notes?: string;
-};
-
-export type ReservationItem = {
-  id: string;
-  batchName: string;
-  recipientOrg: string;
-  recipientPic: string;
-  unitsClaimed: number;
-  pickupTime: string;
-  status: "Menunggu Pengambilan" | "Sudah Diambil" | "Batal";
 };
 
 const initialBatches: BatchItem[] = [
@@ -93,32 +86,13 @@ const initialBatches: BatchItem[] = [
   },
 ];
 
-const initialReservations: ReservationItem[] = [
-  {
-    id: "res-1",
-    batchName: "Nasi kotak ayam",
-    recipientOrg: "Yayasan Kasih Peduli",
-    recipientPic: "Siti Rahma (0812-9988-7766)",
-    unitsClaimed: 12,
-    pickupTime: "12 Okt 2026, 19:30 WIB",
-    status: "Sudah Diambil",
-  },
-  {
-    id: "res-2",
-    batchName: "Roti tawar",
-    recipientOrg: "Dapur Umum Sahabat Warga",
-    recipientPic: "Ahmad Fauzi (0813-2233-4455)",
-    unitsClaimed: 12,
-    pickupTime: "14 Okt 2026, 17:45 WIB",
-    status: "Menunggu Pengambilan",
-  },
-];
-
 export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKey }) {
   const { user, logout } = useAuth();
+  const [overrideRole, setOverrideRole] = useState<"donor" | "recipient" | null>(null);
+  const effectiveRole = overrideRole || (user?.role === "recipient" ? "recipient" : "donor");
+
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [batches, setBatches] = useState<BatchItem[]>(initialBatches);
-  const [reservations, setReservations] = useState<ReservationItem[]>(initialReservations);
   const [batchFilter, setBatchFilter] = useState<BatchStatus>("Semua");
   const [selectedMonth, setSelectedMonth] = useState("Oktober 2026");
   const [monthMenuOpen, setMonthMenuOpen] = useState(false);
@@ -190,6 +164,14 @@ export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKe
     if (batchFilter === "Semua") return true;
     return b.status === batchFilter;
   });
+
+  if (effectiveRole === "recipient") {
+    return (
+      <RecipientDashboardView
+        onSwitchToDonor={() => setOverrideRole("donor")}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f7f5ed] flex flex-col md:flex-row text-[#0d3527] font-sans antialiased">
@@ -324,7 +306,19 @@ export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKe
             </p>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Quick Role Switcher */}
+            <button
+              type="button"
+              onClick={() => setOverrideRole("recipient")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#e7f3ec] hover:bg-[#d5ebd0] text-[#1c6b4f] border border-[#b8dfcb] text-xs font-bold transition-all shadow-2xs cursor-pointer"
+              title="Buka tampilan dashboard penerima makanan surplus"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Tampilan Penerima / Komunitas</span>
+              <span className="sm:hidden">Komunitas</span>
+            </button>
+
             {/* Notification Bell */}
             <div className="relative">
               <button
@@ -404,6 +398,20 @@ export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKe
                     <Package className="w-3.5 h-3.5" />
                     <span>Batch Saya</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const recipient = DEMO_ACCOUNTS.find((a) => a.role === "recipient");
+                      if (recipient) {
+                        setOverrideRole("recipient");
+                      }
+                      setUserMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-50 flex items-center gap-2 cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Mode Penerima (Komunitas)</span>
+                  </button>
                   <div className="border-t border-[#eee] my-1" />
                   <Link
                     href="/login"
@@ -437,14 +445,13 @@ export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKe
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setModalNewOpen(true)}
+                <Link
+                  href="/batch/baru"
                   className="inline-flex items-center gap-2 px-5 py-3 bg-[#1c5c43] hover:bg-[#154a36] text-white font-semibold text-sm rounded-xl shadow-sm transition-all cursor-pointer self-start sm:self-auto"
                 >
                   <Plus className="w-4 h-4 stroke-[2.5]" />
                   <span>Catat surplus baru</span>
-                </button>
+                </Link>
               </div>
 
               {/* Filter controls row */}
@@ -581,13 +588,12 @@ export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKe
                           {/* Aksi: Buka button + Three dots */}
                           <td className="py-4 px-6 text-right relative">
                             <div className="inline-flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => setSelectedBatch(item)}
-                                className="px-4 py-1.5 rounded-xl border border-[#dfdbcf] hover:border-[#1c5c43] hover:bg-white text-xs font-bold text-[#0d3527] transition-all cursor-pointer shadow-2xs"
+                              <Link
+                                href={`/batch/${item.id}`}
+                                className="px-4 py-1.5 rounded-xl border border-[#dfdbcf] hover:border-[#1c5c43] hover:bg-white text-xs font-bold text-[#0d3527] transition-all cursor-pointer shadow-2xs inline-block"
                               >
                                 Buka
-                              </button>
+                              </Link>
 
                               <div className="relative">
                                 <button
@@ -645,12 +651,21 @@ export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKe
               </div>
 
               {/* Bottom Insight Card matching screenshot */}
-              <div className="bg-white rounded-2xl border border-[#e6decf] p-8 text-center shadow-sm">
-                <div className="w-10 h-10 rounded-full bg-[#f4f2ea] flex items-center justify-center mx-auto mb-2 text-[#526359]">
-                  <BarChart3 className="w-5 h-5" />
+              <div className="bg-white rounded-2xl border border-[#e4ddcc] py-9 px-6 text-center shadow-xs">
+                <div className="w-11 h-11 rounded-full bg-[#f2ede4] flex items-center justify-center mx-auto mb-3 text-[#3d5045]">
+                  <svg
+                    className="w-5 h-5 text-[#3d5045]"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <rect x="4" y="13" width="3.5" height="7" rx="1.5" />
+                    <rect x="10.25" y="8" width="3.5" height="12" rx="1.5" />
+                    <rect x="16.5" y="4" width="3.5" height="16" rx="1.5" />
+                  </svg>
                 </div>
                 <h3 className="font-bold text-base text-[#0d3527]">Belum melihat pola?</h3>
-                <p className="text-xs text-[#526359] mt-1">
+                <p className="text-xs sm:text-sm text-[#526359] mt-1">
                   Tutup beberapa batch untuk mendapatkan insight.
                 </p>
               </div>
@@ -892,73 +907,7 @@ export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKe
           {/* TAB: RESERVASI                                           */}
           {/* ──────────────────────────────────────────────────────── */}
           {activeTab === "reservasi" && (
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6decf] shadow-sm">
-              <div className="mb-6">
-                <h2 className="text-2xl font-extrabold text-[#0d3527] tracking-tight">
-                  Klaim & Jadwal Penjemputan
-                </h2>
-                <p className="text-xs sm:text-sm text-[#526359] mt-0.5">
-                  Daftar organisasi penerima yang telah memesan porsi surplus untuk diselamatkan.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {reservations.map((res) => (
-                  <div
-                    key={res.id}
-                    className="p-5 rounded-2xl border border-[#e6decf] bg-[#fbf9f4] flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-base text-[#0d3527]">
-                          {res.recipientOrg}
-                        </span>
-                        <span
-                          className={`text-xs px-2.5 py-0.5 rounded-full font-bold ${
-                            res.status === "Sudah Diambil"
-                              ? "bg-[#eaf4ec] text-[#1c6b4f]"
-                              : "bg-[#fff2e0] text-[#c2842e]"
-                          }`}
-                        >
-                          {res.status}
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#526359] mt-1">
-                        Memesan:{" "}
-                        <strong className="text-[#0d3527]">{res.unitsClaimed} unit</strong> dari{" "}
-                        <strong>{res.batchName}</strong>
-                      </p>
-                      <p className="text-xs text-[#526359] mt-0.5">
-                        PIC: {res.recipientPic} • Estimasi pickup: {res.pickupTime}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {res.status !== "Sudah Diambil" ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setReservations((prev) =>
-                              prev.map((r) =>
-                                r.id === res.id ? { ...r, status: "Sudah Diambil" as const } : r
-                              )
-                            );
-                          }}
-                          className="px-4 py-2 bg-[#1c5c43] hover:bg-[#154e38] text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
-                        >
-                          Konfirmasi Serah-Terima
-                        </button>
-                      ) : (
-                        <span className="text-xs font-semibold text-[#1c6b4f] flex items-center gap-1">
-                          <CheckCircle2 className="w-4 h-4" />
-                          Selesai diserahkan
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ReservasiView showNav={false} />
           )}
 
           {/* ──────────────────────────────────────────────────────── */}

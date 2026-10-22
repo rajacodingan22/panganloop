@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import { DashboardView } from "../dashboard/dashboard-view";
+import { BatchView } from "./batch-view";
 
 export const metadata: Metadata = {
   title: "Batch Saya — PANGANLOOP",
   description: "Lacak setiap surplus dari persiapan sampai outcome.",
+  openGraph: {
+    title: "Batch Saya — PANGANLOOP",
+    description: "Lacak setiap surplus dari persiapan sampai outcome.",
+  },
 };
 
 export default function BatchPage() {
-  return <DashboardView initialTab="batch" />;
+  return <BatchView showNav={true} />;
 }
