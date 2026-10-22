@@ -30,6 +30,7 @@ import {
 import { useAuth, DEMO_ACCOUNTS } from "../_components/auth-context";
 import { ReservasiView } from "../reservasi/reservasi-view";
 import { RecipientDashboardView } from "../_components/recipient-dashboard-view";
+import { AdminView } from "../admin/admin-view";
 
 export type TabKey = "ringkasan" | "batch" | "reservasi" | "insight" | "profil";
 export type BatchStatus = "Semua" | "Draft" | "Dipublikasikan" | "Selesai";
@@ -88,8 +89,8 @@ const initialBatches: BatchItem[] = [
 
 export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKey }) {
   const { user, logout } = useAuth();
-  const [overrideRole, setOverrideRole] = useState<"donor" | "recipient" | null>(null);
-  const effectiveRole = overrideRole || (user?.role === "recipient" ? "recipient" : "donor");
+  const [overrideRole, setOverrideRole] = useState<"donor" | "recipient" | "admin" | null>(null);
+  const effectiveRole = overrideRole || (user?.role === "admin" ? "admin" : user?.role === "recipient" ? "recipient" : "donor");
 
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [batches, setBatches] = useState<BatchItem[]>(initialBatches);
@@ -164,6 +165,10 @@ export function DashboardView({ initialTab = "ringkasan" }: { initialTab?: TabKe
     if (batchFilter === "Semua") return true;
     return b.status === batchFilter;
   });
+
+  if (effectiveRole === "admin") {
+    return <AdminView />;
+  }
 
   if (effectiveRole === "recipient") {
     return (

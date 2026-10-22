@@ -74,6 +74,9 @@ export function SiteHeader() {
           <Link className="nav-link" href="/dashboard">
             Dashboard
           </Link>
+          <Link className="nav-link" href="/admin">
+            Admin
+          </Link>
         </nav>
 
         <div className="nav-actions">
@@ -123,7 +126,14 @@ export function SiteHeader() {
               href="/dashboard"
               onClick={() => setMenuOpen(false)}
             >
-              Dashboard Donor
+              Dashboard
+            </Link>
+            <Link
+              className="mobile-link"
+              href="/admin"
+              onClick={() => setMenuOpen(false)}
+            >
+              Portal Admin
             </Link>
           </nav>
           <div className="mobile-actions">

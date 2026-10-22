@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState } from "react";
 
-export type UserRole = "donor" | "recipient";
+export type UserRole = "donor" | "recipient" | "admin";
 
 export type UserProfile = {
   id: string;
@@ -18,6 +18,18 @@ export type UserProfile = {
 };
 
 export const DEMO_ACCOUNTS: UserProfile[] = [
+  {
+    id: "usr-admin-1",
+    name: "Admin Platform",
+    email: "admin@panganloop.id",
+    role: "admin",
+    roleLabel: "Admin",
+    orgType: "PANGANLOOP Operations",
+    pic: "Administrator",
+    phone: "0811-2233-4455",
+    address: "Jakarta, Indonesia",
+    approved: true,
+  },
   {
     id: "usr-donor-1",
     name: "Dapur Pagi",
@@ -105,8 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       name: name || (email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1)),
       email,
       role,
-      roleLabel: role === "donor" ? "Donor" : "Penerima",
-      orgType: role === "donor" ? "Penyedia Pangan" : "Komunitas Penerima",
+      roleLabel: role === "donor" ? "Donor" : role === "admin" ? "Admin" : "Penerima",
+      orgType: role === "donor" ? "Penyedia Pangan" : role === "admin" ? "Platform Operations" : "Komunitas Penerima",
       pic: name || "Pengelola Akun",
       phone: "0812-0000-0000",
       address: "DKI Jakarta",

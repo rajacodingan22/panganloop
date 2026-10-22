@@ -837,13 +837,12 @@ export function RecipientDashboardView({
                               <span>Kode: {latestActiveReservation.code}</span>
                             </div>
 
-                            <button
-                              type="button"
-                              onClick={() => setActiveReservationModal(latestActiveReservation)}
-                              className="w-full mt-2 py-2.5 rounded-xl border border-[#14532d] text-[#14532d] hover:bg-[#14532d] hover:text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                            <Link
+                              href="/reservasi/saya"
+                              className="w-full mt-2 py-2.5 rounded-xl border border-[#14532d] text-[#14532d] hover:bg-[#14532d] hover:text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
                             >
-                              <span>Buka reservasi</span>
-                            </button>
+                              <span>Buka detail reservasi</span>
+                            </Link>
                           </div>
 
                           <div className="text-right">
@@ -973,13 +972,12 @@ export function RecipientDashboardView({
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => setActiveReservationModal(res)}
+                          <Link
+                            href="/reservasi/saya"
                             className="px-4 py-2 rounded-xl bg-[#14532d] text-white hover:bg-[#0f4023] font-bold text-xs transition-colors"
                           >
-                            Buka Tiket Pickup
-                          </button>
+                            Buka Detail & Kode Pickup
+                          </Link>
                         </div>
                       </div>
                     ))}
