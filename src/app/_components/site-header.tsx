@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePanganloopUi } from "./ui-context";
 
 export function SiteHeader() {
-  const { openInfo, runDemo } = usePanganloopUi();
+  const { openInfo } = usePanganloopUi();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -43,11 +43,6 @@ export function SiteHeader() {
     openInfo();
   };
 
-  const demoFromMenu = (label: string) => {
-    setMenuOpen(false);
-    runDemo(label);
-  };
-
   return (
     <header className={`site-header${scrolled ? " is-scrolled" : ""}`} id="top">
       <div className="container nav">
@@ -79,26 +74,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="nav-actions">
-          <a
-            className="login"
-            href="#"
-            onClick={(event) => {
-              event.preventDefault();
-              runDemo("Masuk");
-            }}
-          >
+          <Link className="login" href="/login">
             Masuk
-          </a>
-          <a
-            className="btn btn-primary btn-sm"
-            href="#"
-            onClick={(event) => {
-              event.preventDefault();
-              runDemo("Pendaftaran gratis");
-            }}
-          >
+          </Link>
+          <Link className="btn btn-primary btn-sm" href="/register">
             Daftar gratis
-          </a>
+          </Link>
           <button
             ref={toggleRef}
             className="nav-toggle"
@@ -136,26 +117,20 @@ export function SiteHeader() {
             </Link>
           </nav>
           <div className="mobile-actions">
-            <a
+            <Link
               className="btn btn-outline"
-              href="#"
-              onClick={(event) => {
-                event.preventDefault();
-                demoFromMenu("Masuk");
-              }}
+              href="/login"
+              onClick={() => setMenuOpen(false)}
             >
               Masuk
-            </a>
-            <a
+            </Link>
+            <Link
               className="btn btn-primary"
-              href="#"
-              onClick={(event) => {
-                event.preventDefault();
-                demoFromMenu("Pendaftaran gratis");
-              }}
+              href="/register"
+              onClick={() => setMenuOpen(false)}
             >
               Daftar gratis
-            </a>
+            </Link>
           </div>
         </div>
       ) : null}

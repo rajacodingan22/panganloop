@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Caveat, DM_Sans } from "next/font/google";
+import { AuthProvider } from "./_components/auth-context";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -23,6 +24,11 @@ export const metadata: Metadata = {
   title: "PANGANLOOP — Surplus hari ini, manfaat hari ini.",
   description:
     "PANGANLOOP menghubungkan surplus makanan dengan komunitas yang membutuhkan. Catat, selamatkan, serahkan, dan pelajari dampaknya untuk sistem pangan yang lebih adil dan berkelanjutan.",
+  openGraph: {
+    title: "PANGANLOOP — Surplus hari ini, manfaat hari ini.",
+    description:
+      "PANGANLOOP menghubungkan surplus makanan dengan komunitas yang membutuhkan. Catat, selamatkan, serahkan, dan pelajari dampaknya untuk sistem pangan yang lebih adil dan berkelanjutan.",
+  },
   icons: {
     icon: [{ url: "/assets/favicon.svg", type: "image/svg+xml" }],
   },
@@ -34,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body
         className={`${display.variable} ${body.variable} ${hand.variable}`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

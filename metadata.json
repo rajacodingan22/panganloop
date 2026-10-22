@@ -1,0 +1,8 @@
+{
+  "name": "PANGANLOOP",
+  "description": "PANGANLOOP menghubungkan surplus makanan dengan komunitas yang membutuhkan. Catat, selamatkan, serahkan, dan pelajari dampaknya untuk sistem pangan yang lebih adil dan berkelanjutan.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

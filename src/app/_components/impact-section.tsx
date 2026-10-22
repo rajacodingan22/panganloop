@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertIcon, BoxIcon, ChartIcon, ChevronRightIcon, InfoIcon, ShieldCheckIcon } from "./icons";
+import { AlertIcon, BoxIcon, ChevronRightIcon, InfoIcon, ShieldCheckIcon } from "./icons";
 import { usePanganloopUi } from "./ui-context";
 
 /* ─── Static demo data ──────────────────────────────────────────── */
