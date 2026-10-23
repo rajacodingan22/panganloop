@@ -1,16 +1,17 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { AdminView } from "./admin-view";
+import { AdminDashboard } from "../_components/role-dashboards";
+import { Spinner } from "../_components/ui-kit";
 
 export const metadata: Metadata = {
-  title: "Admin Platform Overview — PANGANLOOP",
-  description:
-    "Pantau aktivitas platform, tinjau organisasi baru, audit integritas, dan kelola listing pangan di PANGANLOOP.",
-  openGraph: {
-    title: "Admin Platform Overview — PANGANLOOP",
-    description: "Pantau aktivitas, tinjau permintaan, dan jaga keamanan platform PANGANLOOP.",
-  },
+  title: "Admin — PANGANLOOP",
+  description: "Tinjau organisasi, awasi listing, dan periksa jejak audit.",
 };
 
 export default function AdminPage() {
-  return <AdminView />;
+  return (
+    <Suspense fallback={<Spinner />}>
+      <AdminDashboard />
+    </Suspense>
+  );
 }

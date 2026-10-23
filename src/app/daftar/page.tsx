@@ -1,12 +1,5 @@
-import type { Metadata } from "next";
-import { RegisterView } from "../register/register-view";
-
-export const metadata: Metadata = {
-  title: "Buat Akun — PANGANLOOP",
-  description:
-    "Bergabunglah dengan PANGANLOOP dan jadi bagian dari solusi untuk sistem pangan yang lebih adil dan berkelanjutan.",
-};
+import { redirect } from "next/navigation";
 
 export default function DaftarPage() {
-  return <RegisterView />;
+  redirect("/register");
 }

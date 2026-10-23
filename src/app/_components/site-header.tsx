@@ -3,10 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { usePanganloop } from "./store";
 import { usePanganloopUi } from "./ui-context";
+
+const PUBLIC_LINKS = [
+  { label: "Jelajahi surplus", href: "/surplus" },
+  { label: "Dampak", href: "/#dampak" },
+];
 
 export function SiteHeader() {
   const { openInfo } = usePanganloopUi();
+  const { user, ready } = usePanganloop();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -38,10 +45,7 @@ export function SiteHeader() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [menuOpen]);
 
-  const openInfoFromMenu = () => {
-    setMenuOpen(false);
-    openInfo();
-  };
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <header className={`site-header${scrolled ? " is-scrolled" : ""}`} id="top">
@@ -50,7 +54,7 @@ export function SiteHeader() {
           className="brand"
           href="/"
           aria-label="PANGANLOOP — beranda"
-          onClick={() => setMenuOpen(false)}
+          onClick={closeMenu}
         >
           <Image
             src="/assets/panganloop-logo.png"
@@ -65,26 +69,28 @@ export function SiteHeader() {
           <button className="nav-link" type="button" onClick={openInfo}>
             Cara kerja
           </button>
-          <Link className="nav-link" href="/#surplus">
-            Surplus aktif
-          </Link>
-          <Link className="nav-link" href="/komunitas">
-            Portal Komunitas
-          </Link>
-          <Link className="nav-link" href="/dashboard">
-            Dashboard
-          </Link>
-          <Link className="nav-link" href="/admin">
-            Admin
-          </Link>
+          {PUBLIC_LINKS.map((link) => (
+            <Link className="nav-link" href={link.href} key={link.href}>
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
         <div className="nav-actions">
-          <Link className="login" href="/login">
-            Masuk
-          </Link>
-          <Link className="btn btn-primary btn-sm" href="/register">
-            Daftar gratis
+          {ready && user ? (
+            <Link className="login" href="/dashboard">
+              Dashboard
+            </Link>
+          ) : (
+            <Link className="login" href="/login">
+              Masuk
+            </Link>
+          )}
+          <Link
+            className="btn btn-primary btn-sm"
+            href={user ? "/dashboard" : "/register"}
+          >
+            {user ? "Buka dashboard" : "Daftar gratis"}
           </Link>
           <button
             ref={toggleRef}
@@ -104,52 +110,34 @@ export function SiteHeader() {
       {menuOpen ? (
         <div className="mobile-menu" id="mobile-menu">
           <nav aria-label="Navigasi seluler">
-            <button className="mobile-link" type="button" onClick={openInfoFromMenu}>
+            <button className="mobile-link" type="button" onClick={openInfo}>
               Cara kerja
             </button>
-            <Link
-              className="mobile-link"
-              href="/#surplus"
-              onClick={() => setMenuOpen(false)}
-            >
-              Surplus aktif
-            </Link>
-            <Link
-              className="mobile-link"
-              href="/komunitas"
-              onClick={() => setMenuOpen(false)}
-            >
-              Portal Komunitas
-            </Link>
-            <Link
-              className="mobile-link"
-              href="/dashboard"
-              onClick={() => setMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
-            <Link
-              className="mobile-link"
-              href="/admin"
-              onClick={() => setMenuOpen(false)}
-            >
-              Portal Admin
-            </Link>
+            {PUBLIC_LINKS.map((link) => (
+              <Link
+                className="mobile-link"
+                href={link.href}
+                key={link.href}
+                onClick={closeMenu}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
           <div className="mobile-actions">
             <Link
               className="btn btn-outline"
-              href="/login"
-              onClick={() => setMenuOpen(false)}
+              href={user ? "/dashboard" : "/login"}
+              onClick={closeMenu}
             >
-              Masuk
+              {user ? "Dashboard" : "Masuk"}
             </Link>
             <Link
               className="btn btn-primary"
-              href="/register"
-              onClick={() => setMenuOpen(false)}
+              href={user ? "/dashboard" : "/register"}
+              onClick={closeMenu}
             >
-              Daftar gratis
+              {user ? "Buka dashboard" : "Daftar gratis"}
             </Link>
           </div>
         </div>

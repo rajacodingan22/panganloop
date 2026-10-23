@@ -1,69 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import { AlertIcon, BoxIcon, ChevronRightIcon, InfoIcon, ShieldCheckIcon } from "./icons";
+import { getSurplus, usePanganloop } from "./store";
 import { usePanganloopUi } from "./ui-context";
 
-/* ─── Static demo data ──────────────────────────────────────────── */
-const stats = [
-  {
-    icon: <BoxIcon className="imp-stat-icon" />,
-    label: "Surplus dipublikasikan",
-    value: "86",
-    unit: "unit",
-    desc: "Makanan dan bahan pangan yang ditawarkan melalui platform.",
-    accent: false,
-  },
-  {
-    icon: <ShieldCheckIcon className="imp-stat-icon" />,
-    label: "Rescued",
-    value: "54",
-    unit: "unit",
-    desc: "Berhasil diterima dan dimanfaatkan oleh penerima.",
-    accent: false,
-  },
-  {
-    icon: <CheckCircleIcon />,
-    label: "Pickup selesai",
-    value: "82",
-    unit: "%",
-    desc: "Dari surplus yang diklaim.",
-    accent: false,
-  },
-  {
-    icon: <AlertIcon className="imp-stat-icon" />,
-    label: "Belum tersalurkan",
-    value: "18",
-    unit: "unit",
-    desc: "Masih menunggu pickup atau batal.",
-    accent: true,
-  },
-];
-
-const weeks = [
-  { label: "Minggu 1", sub: "1–5 Okt", listed: 23, rescued: 15 },
-  { label: "Minggu 2", sub: "6–12 Okt", listed: 28, rescued: 19 },
-  { label: "Minggu 3", sub: "13–19 Okt", listed: 18, rescued: 13 },
-];
-
-const metricGuide = [
-  {
-    icon: <BoxIcon className="imp-legend-icon" />,
-    term: "Dipublikasikan (listed)",
-    desc: "Jumlah surplus makanan dan bahan pangan yang diunggah di PANGANLOOP.",
-  },
-  {
-    icon: <ShieldCheckIcon className="imp-legend-icon" />,
-    term: "Diklaim (claimed)",
-    desc: "Jumlah surplus yang diklaim oleh penerima (mis. komunitas, NGO, atau individu).",
-  },
-  {
-    icon: <CheckCircleIcon />,
-    term: "Diselamatkan (rescued)",
-    desc: "Jumlah surplus yang benar-benar diterima oleh penerima dan tidak terbuang.",
-  },
-];
-
-/* ─── Inline SVG not in icons.tsx ──────────────────────────────── */
 function CheckCircleIcon() {
   return (
     <svg
@@ -100,35 +41,51 @@ function CalendarIcon() {
   );
 }
 
-/* ─── Bar chart (pure SVG, no library) ─────────────────────────── */
-const CHART_W = 480;
-const CHART_H = 180;
-const PADDING = { top: 16, right: 16, bottom: 48, left: 32 };
-const MAX_VAL = 30;
+const metricGuide = [
+  {
+    icon: <BoxIcon className="imp-legend-icon" />,
+    term: "Dipublikasikan (listed)",
+    desc: "Jumlah surplus makanan dan bahan pangan yang diunggah di PANGANLOOP.",
+  },
+  {
+    icon: <ShieldCheckIcon className="imp-legend-icon" />,
+    term: "Diklaim (claimed)",
+    desc: "Jumlah surplus yang diklaim oleh penerima (mis. komunitas, NGO, atau individu).",
+  },
+  {
+    icon: <CheckCircleIcon />,
+    term: "Diselamatkan (rescued)",
+    desc: "Jumlah surplus yang benar-benar diterima oleh penerima dan tidak terbuang.",
+  },
+];
 
-function ImpactChart() {
+type ChartGroup = { label: string; sub: string; listed: number; rescued: number };
+
+function ImpactChart({ groups }: { groups: ChartGroup[] }) {
+  const CHART_W = 480;
+  const CHART_H = 180;
+  const PADDING = { top: 16, right: 16, bottom: 48, left: 32 };
+  const maxRaw = Math.max(1, ...groups.flatMap((group) => [group.listed, group.rescued]));
+  const MAX_VAL = Math.max(10, Math.ceil(maxRaw / 10) * 10);
   const barW = 28;
   const gap = 10;
   const groupW = barW * 2 + gap;
-  const totalGroups = weeks.length;
   const plotW = CHART_W - PADDING.left - PADDING.right;
   const plotH = CHART_H - PADDING.top - PADDING.bottom;
-  const sectionW = plotW / totalGroups;
+  const sectionW = plotW / Math.max(groups.length, 1);
+  const yLines = [0, MAX_VAL / 2, MAX_VAL];
 
-  const yLines = [0, 10, 20, 30];
-
-  function barH(val: number) {
-    return (val / MAX_VAL) * plotH;
+  function barH(value: number) {
+    return (value / MAX_VAL) * plotH;
   }
 
   return (
     <svg
       viewBox={`0 0 ${CHART_W} ${CHART_H}`}
       role="img"
-      aria-label="Bar chart: dipublikasikan vs berhasil diambil per minggu"
+      aria-label="Bar chart: surplus dipublikasikan vs berhasil diambil per kategori"
       className="imp-chart-svg"
     >
-      {/* Y-axis grid lines */}
       {yLines.map((y) => {
         const cy = PADDING.top + plotH - (y / MAX_VAL) * plotH;
         return (
@@ -148,24 +105,22 @@ function ImpactChart() {
               fontSize="10"
               fill="rgba(13,53,39,0.4)"
             >
-              {y}
+              {Math.round(y)}
             </text>
           </g>
         );
       })}
 
-      {/* Bars */}
-      {weeks.map((week, i) => {
+      {groups.map((group, i) => {
         const cx = PADDING.left + i * sectionW + sectionW / 2;
-        const listedH = barH(week.listed);
-        const rescuedH = barH(week.rescued);
+        const listedH = barH(group.listed);
+        const rescuedH = barH(group.rescued);
         const listedX = cx - groupW / 2;
         const rescuedX = listedX + barW + gap;
         const baseY = PADDING.top + plotH;
 
         return (
-          <g key={week.label}>
-            {/* Listed bar */}
+          <g key={group.label}>
             <rect
               x={listedX}
               y={baseY - listedH}
@@ -174,7 +129,6 @@ function ImpactChart() {
               rx="5"
               fill="#a8c5a0"
             />
-            {/* Rescued bar */}
             <rect
               x={rescuedX}
               y={baseY - rescuedH}
@@ -183,7 +137,6 @@ function ImpactChart() {
               rx="5"
               fill="#2c7a57"
             />
-            {/* X labels */}
             <text
               x={cx}
               y={baseY + 16}
@@ -192,7 +145,7 @@ function ImpactChart() {
               fontWeight="600"
               fill="rgba(13,53,39,0.65)"
             >
-              {week.label}
+              {group.label}
             </text>
             <text
               x={cx}
@@ -201,7 +154,7 @@ function ImpactChart() {
               fontSize="10"
               fill="rgba(13,53,39,0.38)"
             >
-              {week.sub}
+              {group.sub}
             </text>
           </g>
         );
@@ -210,46 +163,132 @@ function ImpactChart() {
   );
 }
 
-/* ─── Main component ────────────────────────────────────────────── */
 export function ImpactSection() {
+  const { state } = usePanganloop();
   const { runDemo } = usePanganloopUi();
+
+  const metrics = useMemo(() => {
+    const listedBatches = state.batches.filter(
+      (batch) => batch.status === "published" || batch.status === "closed",
+    );
+    const listed = listedBatches.reduce((total, batch) => total + getSurplus(batch), 0);
+
+    const rescued = state.batches.reduce((total, batch) => {
+      if (batch.status === "closed" && batch.closeout) return total + batch.closeout.rescued;
+      return (
+        total +
+        state.reservations
+          .filter((reservation) => reservation.batchId === batch.id && reservation.status === "picked_up")
+          .reduce((sum, reservation) => sum + reservation.units, 0)
+      );
+    }, 0);
+
+    const unclaimed = state.batches.reduce(
+      (total, batch) =>
+        total + (batch.status === "closed" ? batch.closeout?.unclaimed ?? 0 : 0),
+      0,
+    );
+    const completion = rescued + unclaimed > 0 ? Math.round((rescued / (rescued + unclaimed)) * 100) : 0;
+
+    const groups: ChartGroup[] = Array.from(new Set(listedBatches.map((batch) => batch.category)))
+      .map((category) => {
+        const batches = listedBatches.filter((batch) => batch.category === category);
+        return {
+          label: category.split(" ")[0],
+          sub: `${batches.length} batch`,
+          listed: batches.reduce((total, batch) => total + getSurplus(batch), 0),
+          rescued: batches.reduce((total, batch) => {
+            if (batch.status === "closed" && batch.closeout) return total + batch.closeout.rescued;
+            return (
+              total +
+              state.reservations
+                .filter(
+                  (reservation) =>
+                    reservation.batchId === batch.id && reservation.status === "picked_up",
+                )
+                .reduce((sum, reservation) => sum + reservation.units, 0)
+            );
+          }, 0),
+        };
+      })
+      .filter((group) => group.listed > 0)
+      .sort((a, b) => b.listed - a.listed)
+      .slice(0, 3);
+
+    return { listed, rescued, unclaimed, completion, groups };
+  }, [state.batches, state.reservations]);
+
+  const stats = [
+    {
+      icon: <BoxIcon className="imp-stat-icon" />,
+      label: "Surplus dipublikasikan",
+      value: String(metrics.listed),
+      unit: "unit",
+      desc: "Total unit surplus pada batch yang pernah tayang.",
+      accent: false,
+    },
+    {
+      icon: <ShieldCheckIcon className="imp-stat-icon" />,
+      label: "Rescued",
+      value: String(metrics.rescued),
+      unit: "unit",
+      desc: "Unit yang sudah diambil penerima atau ditutup sebagai tersalurkan.",
+      accent: false,
+    },
+    {
+      icon: <CheckCircleIcon />,
+      label: "Pickup selesai",
+      value: String(metrics.completion),
+      unit: "%",
+      desc: "Rasio unit tersalurkan terhadap unit yang sudah memiliki outcome.",
+      accent: false,
+    },
+    {
+      icon: <AlertIcon className="imp-stat-icon" />,
+      label: "Belum tersalurkan",
+      value: String(metrics.unclaimed),
+      unit: "unit",
+      desc: "Unit pada batch closed yang tidak berhasil diselamatkan.",
+      accent: true,
+    },
+  ];
 
   return (
     <section className="imp" id="dampak" aria-labelledby="imp-title">
       <div className="container">
-
-        {/* ── Header ─────────────────────────────────────────── */}
         <div className="imp-header reveal">
           <div className="imp-header-copy">
-            <p className="imp-eyebrow">Transparansi dampak</p>
+            <p className="imp-eyebrow">Transparansi dampak · mode demo</p>
             <h2 id="imp-title">Dampak yang dapat ditelusuri</h2>
             <p className="imp-sub">
-              Angka di bawah berasal dari batch dan pickup yang benar-benar dicatat.
+              Angka dihitung dari batch dan reservasi pada data demo di browser ini.
             </p>
           </div>
 
           <div className="imp-header-actions">
             <div className="imp-date-pill">
               <CalendarIcon />
-              <span>1–19 Oktober 2026</span>
+              <span>Data demo saat ini</span>
               <ChevronRightIcon className="imp-date-caret icon" />
             </div>
             <button
               type="button"
               className="imp-demo-btn"
-              onClick={() => runDemo("Filter tanggal")}
+              onClick={() => runDemo("Sumber angka dampak")}
             >
-              Demo data
+              Sumber data
               <InfoIcon className="icon" />
             </button>
           </div>
         </div>
 
-        {/* ── Stat cards ─────────────────────────────────────── */}
         <div className="imp-stats reveal" style={{ "--delay": ".1s" } as React.CSSProperties}>
           {stats.map((s) => (
             <div className={`imp-stat${s.accent ? " imp-stat--warn" : ""}`} key={s.label}>
-              <span className={`imp-stat-icon-wrap${s.accent ? " imp-stat-icon-wrap--warn" : ""}`} aria-hidden="true">
+              <span
+                className={`imp-stat-icon-wrap${s.accent ? " imp-stat-icon-wrap--warn" : ""}`}
+                aria-hidden="true"
+              >
                 {s.icon}
               </span>
               <div className="imp-stat-body">
@@ -264,13 +303,10 @@ export function ImpactSection() {
           ))}
         </div>
 
-        {/* ── Chart + Legend row ─────────────────────────────── */}
         <div className="imp-body reveal" style={{ "--delay": ".18s" } as React.CSSProperties}>
-
-          {/* Chart panel */}
           <div className="imp-chart-panel">
             <div className="imp-chart-top">
-              <p className="imp-chart-title">Dipublikasikan vs berhasil diambil</p>
+              <p className="imp-chart-title">Dipublikasikan vs berhasil diambil per kategori</p>
               <div className="imp-chart-legend">
                 <span className="imp-chart-dot imp-chart-dot--listed" />
                 <span>Dipublikasikan</span>
@@ -278,10 +314,13 @@ export function ImpactSection() {
                 <span>Berhasil diambil (rescued)</span>
               </div>
             </div>
-            <ImpactChart />
+            {metrics.groups.length > 0 ? (
+              <ImpactChart groups={metrics.groups} />
+            ) : (
+              <p className="imp-chart-empty">Belum ada batch yang dipublikasikan.</p>
+            )}
           </div>
 
-          {/* Metric guide panel */}
           <div className="imp-guide-panel">
             <p className="imp-guide-title">Cara membaca metrik</p>
             <ul className="imp-guide-list">
@@ -300,13 +339,11 @@ export function ImpactSection() {
           </div>
         </div>
 
-        {/* ── Footer note ────────────────────────────────────── */}
         <p className="imp-footnote reveal" style={{ "--delay": ".22s" } as React.CSSProperties}>
           <InfoIcon className="icon" />
-          Berdasarkan data yang dicatat pengguna; bukan pengukuran independen.
-          <span className="imp-footnote-right">🌿 Lebih sedikit terbuang. Lebih banyak kesempatan.</span>
+          Berdasarkan data demo yang dicatat di browser; bukan pengukuran independen.
+          <span className="imp-footnote-right">Lebih sedikit terbuang. Lebih banyak kesempatan.</span>
         </p>
-
       </div>
     </section>
   );

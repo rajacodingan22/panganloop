@@ -1,3 +1,5 @@
-import CatatSurplusBaruPage from "../baru/page";
+import { redirect } from "next/navigation";
 
-export default CatatSurplusBaruPage;
+export default function CatatBatchPage() {
+  redirect("/batch/baru");
+}

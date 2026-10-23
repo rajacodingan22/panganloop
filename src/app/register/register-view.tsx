@@ -3,94 +3,87 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import {
+  ArrowRight,
+  Building2,
   Eye,
   EyeOff,
-  Info,
+  Leaf,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
   ShieldCheck,
   Store,
+  UserRound,
   Users,
-  X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { usePanganloop } from "../_components/store";
+import { Button, Field, Input, Notice, Spinner, Textarea } from "../_components/ui-kit";
 
-type RoleType = "business" | "recipient";
+type RoleInput = "donor" | "recipient";
 
 export function RegisterView() {
   const router = useRouter();
-  const [role, setRole] = useState<RoleType>("business");
-  const [fullName, setFullName] = useState("");
-  const [orgName, setOrgName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { ready, register } = usePanganloop();
+  const [role, setRole] = useState<RoleInput>("donor");
+  const [form, setForm] = useState({
+    name: "",
+    pic: "",
+    email: "",
+    password: "",
+    phone: "",
+    address: "",
+    area: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
-  const [feedbackType, setFeedbackType] = useState<"success" | "error">("success");
-  const [isPending, startTransition] = useTransition();
+  const update = (key: keyof typeof form) => (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => setForm((current) => ({ ...current, [key]: event.target.value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fullName || !orgName || !email || !password) {
-      setFeedbackType("error");
-      setFeedbackMessage("Silakan lengkapi semua data pendaftaran.");
-      return;
-    }
-
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(null);
     if (!agreed) {
-      setFeedbackType("error");
-      setFeedbackMessage(
-        "Harap centang persetujuan informasi pangan untuk melanjutkan."
-      );
+      setError("Centang pernyataan bahwa informasi yang diisi benar dan makanan aman.");
       return;
     }
-
-    startTransition(async () => {
-      // Simulate registration
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      setFeedbackType("success");
-      setFeedbackMessage(
-        `Akun ${
-          role === "business" ? "Pengelola Usaha" : "Organisasi Penerima"
-        } untuk ${fullName} (${orgName}) berhasil didaftarkan! Mengarahkan ke dasbor...`
-      );
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 800);
-    });
+    setSubmitting(true);
+    const result = register({ role, ...form });
+    if (!result.ok) {
+      setError(result.error);
+      setSubmitting(false);
+      return;
+    }
+    router.replace("/dashboard");
   };
 
+  if (!ready) return <Spinner />;
+
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(900px_640px_at_96%_-6%,rgba(246,214,150,0.35),transparent_62%),radial-gradient(820px_560px_at_-8%_102%,rgba(197,214,190,0.3),transparent_64%),#faf6ea] text-[#0d3527] font-sans antialiased selection:bg-[#f0aa3e]/30 selection:text-[#0d3527]">
-      {/* ────────────────────────────────────────────────────────── */}
-      {/* TOP HEADER: BRAND LOGO + MASUK LINK                        */}
-      {/* ────────────────────────────────────────────────────────── */}
-      <header className="w-full border-b border-[#0d3527]/8 bg-[#faf6ea]/80 backdrop-blur-sm sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 h-20 flex items-center justify-between">
-          <Link
-            href="/"
-            className="brand inline-flex transition-opacity hover:opacity-90"
-            aria-label="PANGANLOOP — Kembali ke Beranda"
-          >
+    <div className="min-h-screen bg-[radial-gradient(900px_640px_at_96%_-6%,rgba(246,214,150,0.35),transparent_62%),radial-gradient(820px_560px_at_-8%_102%,rgba(197,214,190,0.3),transparent_64%),#faf6ea] text-[#0d3527]">
+      <header className="sticky top-0 z-30 border-b border-[#0d35270f] bg-[#faf6ea]/85 backdrop-blur">
+        <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
+          <Link href="/" aria-label="PANGANLOOP — beranda">
             <Image
               src="/assets/panganloop-logo.png"
-              alt="PANGANLOOP — Lebih Banyak Manfaat. Lebih Sedikit Terbuang."
+              alt="PANGANLOOP"
               width={2172}
               height={724}
               priority
-              className="w-[185px] sm:w-[205px] h-auto mix-blend-multiply"
+              className="h-auto w-44 mix-blend-multiply sm:w-52"
             />
           </Link>
-
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline text-xs sm:text-sm text-[#526359]">
-              Sudah punya akun?
-            </span>
+            <span className="hidden text-sm text-[#526359] sm:inline">Sudah punya akun?</span>
             <Link
               href="/login"
-              className="px-4 py-2 rounded-xl border border-[#0d3527]/25 hover:border-[#0d3527]/60 text-xs sm:text-sm font-semibold text-[#0d3527] bg-[#fffdf8]/60 hover:bg-[#fffdf8] transition-all"
+              className="rounded-xl border border-[#0d35273d] bg-[#fffdf8]/70 px-4 py-2 text-sm font-semibold transition hover:bg-[#fffdf8]"
             >
               Masuk
             </Link>
@@ -98,401 +91,226 @@ export function RegisterView() {
         </div>
       </header>
 
-      {/* ────────────────────────────────────────────────────────── */}
-      {/* MAIN CONTAINER: 3-COLUMN LAYOUT                            */}
-      {/* ────────────────────────────────────────────────────────── */}
-      <main className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-8 sm:py-12 lg:py-14">
-        {/* Feedback notification toast */}
-        <AnimatePresence>
-          {feedbackMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className={`max-w-xl mx-auto mb-8 p-4 rounded-2xl text-sm flex items-start gap-3 border shadow-sm ${
-                feedbackType === "success"
-                  ? "bg-[#eaf4ec] border-[#b8dec0] text-[#155c43]"
-                  : "bg-[#fdf0ed] border-[#f4c2b9] text-[#9b2c1a]"
-              }`}
-            >
-              <div className="shrink-0 mt-0.5">
-                {feedbackType === "success" ? (
-                  <ShieldCheck className="w-5 h-5" />
-                ) : (
-                  <X className="w-5 h-5" />
-                )}
-              </div>
-              <div className="flex-1 font-medium">{feedbackMessage}</div>
-              <button
-                type="button"
-                onClick={() => setFeedbackMessage(null)}
-                className="text-current opacity-70 hover:opacity-100 p-0.5 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <main className="mx-auto grid max-w-6xl gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:py-12">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#1c6b4f]">
+            Pendaftaran organisasi
+          </p>
+          <h1 className="mt-2 font-display text-3xl font-semibold leading-tight sm:text-4xl">
+            Bergabung dalam jejaring penyelamatan pangan
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#526359]">
+            Akun baru berstatus menunggu verifikasi admin. Anda dapat masuk dan melihat data,
+            tetapi belum bisa membuat batch atau mengajukan pickup sampai disetujui.
+          </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-start">
-          {/* ──────────────────────────────────────────────────────── */}
-          {/* COLUMN 1 (LEFT): HEADLINE + CRATE ILLUSTRATION           */}
-          {/* ──────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-3 xl:col-span-3 flex flex-col justify-between self-stretch pt-2">
-            <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-[40px] xl:text-[44px] font-extrabold text-[#0d3527] leading-[1.12] tracking-tight">
-                Pangan
-                <br />
-                Tidak Harus
-                <br />
-                Terbuang
-              </h1>
-
-              <p className="mt-4 text-sm sm:text-base text-[#40564b] leading-relaxed max-w-sm">
-                Bersama PANGANLOOP, kita hubungkan kelebihan pangan dengan mereka
-                yang membutuhkan.
-              </p>
+          {error ? (
+            <div className="mt-5">
+              <Notice tone="error">{error}</Notice>
             </div>
+          ) : null}
 
-            {/* Bottom Crate with fresh vegetables matching screenshot */}
-            <div className="mt-8 lg:mt-16 xl:mt-24 relative w-full max-w-[270px] sm:max-w-[300px]">
-              <div className="relative aspect-[780/834] w-full">
-                <Image
-                  src="/assets/crate-vegetables-hd.png"
-                  alt="Pangan Lebih Bermakna Untuk Semua — Kotak kayu berisi sayuran segar"
-                  fill
-                  priority
-                  className="object-contain object-bottom-left mix-blend-multiply"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* ──────────────────────────────────────────────────────── */}
-          {/* COLUMN 2 (CENTER): REGISTRATION FORM CARD                */}
-          {/* ──────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-5 xl:col-span-5">
-            <div className="bg-white rounded-3xl p-6 sm:p-9 shadow-[0_12px_40px_-16px_rgba(13,53,39,0.12)] border border-[#e8e2d4]">
-              {/* Form Title & Subtitle */}
-              <div className="mb-6">
-                <h2 className="text-2xl sm:text-[30px] font-extrabold text-[#0d3527] tracking-tight">
-                  Buat akun
-                </h2>
-                <p className="mt-1.5 text-xs sm:text-sm text-[#526359] leading-relaxed">
-                  Bergabunglah dengan PANGANLOOP dan jadi bagian dari solusi untuk
-                  sistem pangan yang lebih berkelanjutan.
-                </p>
-              </div>
-
-              {/* Role Selector Tabs (Pengelola usaha vs Organisasi penerima) */}
-              <div className="bg-[#f5f1e7] p-1.5 rounded-2xl border border-[#e2dccd] grid grid-cols-2 gap-1.5 mb-6">
+          <form onSubmit={submit} className="mt-6 space-y-5">
+            <div className="rounded-2xl border border-[#0d35271a] bg-[#fffdf8] p-5">
+              <h2 className="font-display text-lg font-semibold">Peran organisasi</h2>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <button
                   type="button"
-                  onClick={() => setRole("business")}
-                  className={`p-3 rounded-xl flex items-start gap-2.5 text-left transition-all cursor-pointer ${
-                    role === "business"
-                      ? "bg-[#1c5c43] text-white shadow-sm"
-                      : "text-[#0d3527] hover:bg-white/60"
+                  onClick={() => setRole("donor")}
+                  className={`rounded-xl border p-4 text-left transition ${
+                    role === "donor"
+                      ? "border-[#155c43] bg-[#eef6f1] ring-2 ring-[#155c43]/15"
+                      : "border-[#dfdbcf] bg-white hover:border-[#155c43]/50"
                   }`}
                 >
-                  <Store
-                    className={`w-5 h-5 shrink-0 mt-0.5 ${
-                      role === "business" ? "text-white" : "text-[#1c5c43]"
-                    }`}
-                  />
-                  <div>
-                    <div className="font-bold text-xs sm:text-sm leading-tight">
-                      Pengelola usaha
-                    </div>
-                    <div
-                      className={`text-[10px] sm:text-[11px] leading-tight mt-0.5 ${
-                        role === "business" ? "text-[#c2dfd3]" : "text-[#5e6f64]"
-                      }`}
-                    >
-                      Restoran, toko, hotel, dll.
-                    </div>
-                  </div>
+                  <Store className="size-5 text-[#155c43]" />
+                  <span className="mt-2 block text-sm font-semibold">Donor / penyedia pangan</span>
+                  <span className="mt-0.5 block text-xs text-[#5e6f64]">
+                    Restoran, bakery, katering, toko makanan.
+                  </span>
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setRole("recipient")}
-                  className={`p-3 rounded-xl flex items-start gap-2.5 text-left transition-all cursor-pointer ${
+                  className={`rounded-xl border p-4 text-left transition ${
                     role === "recipient"
-                      ? "bg-[#1c5c43] text-white shadow-sm"
-                      : "text-[#0d3527] hover:bg-white/60"
+                      ? "border-[#155c43] bg-[#eef6f1] ring-2 ring-[#155c43]/15"
+                      : "border-[#dfdbcf] bg-white hover:border-[#155c43]/50"
                   }`}
                 >
-                  <Users
-                    className={`w-5 h-5 shrink-0 mt-0.5 ${
-                      role === "recipient" ? "text-white" : "text-[#1c5c43]"
-                    }`}
-                  />
-                  <div>
-                    <div className="font-bold text-xs sm:text-sm leading-tight">
-                      Organisasi penerima
-                    </div>
-                    <div
-                      className={`text-[10px] sm:text-[11px] leading-tight mt-0.5 ${
-                        role === "recipient" ? "text-[#c2dfd3]" : "text-[#5e6f64]"
-                      }`}
-                    >
-                      Bank pangan, yayasan, dll.
-                    </div>
-                  </div>
+                  <Users className="size-5 text-[#155c43]" />
+                  <span className="mt-2 block text-sm font-semibold">Penerima / komunitas</span>
+                  <span className="mt-0.5 block text-xs text-[#5e6f64]">
+                    Panti, dapur umum, organisasi food rescue.
+                  </span>
                 </button>
               </div>
+            </div>
 
-              {/* Input Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Nama lengkap */}
-                <div>
-                  <label
-                    htmlFor="fullName"
-                    className="block text-xs sm:text-sm font-semibold text-[#0d3527] mb-1.5"
-                  >
-                    Nama lengkap
-                  </label>
-                  <input
-                    id="fullName"
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Contoh: Budi Santoso"
-                    className="w-full bg-[#fdfdfc] border border-[#dfdbcf] text-[#0d3527] placeholder-[#9aa59e] text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1c5c43]/25 focus:border-[#1c5c43] transition-all"
-                  />
+            <div className="rounded-2xl border border-[#0d35271a] bg-[#fffdf8] p-5">
+              <h2 className="font-display text-lg font-semibold">Data organisasi</h2>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Field label={role === "donor" ? "Nama usaha" : "Nama organisasi"}>
+                    <div className="relative">
+                      <Building2 className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#8a958e]" />
+                      <Input
+                        required
+                        value={form.name}
+                        onChange={update("name")}
+                        placeholder={
+                          role === "donor" ? "Contoh: Bakery Suka Rasa" : "Contoh: Dapur Peduli"
+                        }
+                        className="pl-10"
+                      />
+                    </div>
+                  </Field>
                 </div>
-
-                {/* Nama organisasi */}
-                <div>
-                  <label
-                    htmlFor="orgName"
-                    className="block text-xs sm:text-sm font-semibold text-[#0d3527] mb-1.5"
-                  >
-                    Nama organisasi
-                  </label>
-                  <input
-                    id="orgName"
-                    type="text"
-                    required
-                    value={orgName}
-                    onChange={(e) => setOrgName(e.target.value)}
-                    placeholder={
-                      role === "business"
-                        ? "Contoh: Toko Segar Abadi"
-                        : "Contoh: Yayasan Peduli Sesama"
-                    }
-                    className="w-full bg-[#fdfdfc] border border-[#dfdbcf] text-[#0d3527] placeholder-[#9aa59e] text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1c5c43]/25 focus:border-[#1c5c43] transition-all"
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-xs sm:text-sm font-semibold text-[#0d3527] mb-1.5"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="contoh@email.com"
-                    className="w-full bg-[#fdfdfc] border border-[#dfdbcf] text-[#0d3527] placeholder-[#9aa59e] text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1c5c43]/25 focus:border-[#1c5c43] transition-all"
-                  />
-                </div>
-
-                {/* Kata sandi */}
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-xs sm:text-sm font-semibold text-[#0d3527] mb-1.5"
-                  >
-                    Kata sandi
-                  </label>
-                  <div className="relative flex items-center">
-                    <input
-                      id="password"
+                <Field label="Penanggung jawab">
+                  <div className="relative">
+                    <UserRound className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#8a958e]" />
+                    <Input
+                      required
+                      value={form.pic}
+                      onChange={update("pic")}
+                      placeholder="Nama lengkap"
+                      className="pl-10"
+                    />
+                  </div>
+                </Field>
+                <Field label="Email">
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#8a958e]" />
+                    <Input
+                      type="email"
+                      required
+                      value={form.email}
+                      onChange={update("email")}
+                      placeholder="kontak@organisasi.id"
+                      className="pl-10"
+                    />
+                  </div>
+                </Field>
+                <Field label="Kata sandi" hint="Minimal 8 karakter.">
+                  <div className="relative">
+                    <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#8a958e]" />
+                    <Input
                       type={showPassword ? "text" : "password"}
                       required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Minimal 8 karakter"
-                      className="w-full bg-[#fdfdfc] border border-[#dfdbcf] text-[#0d3527] placeholder-[#9aa59e] text-sm rounded-xl pl-4 pr-11 py-3 focus:outline-none focus:ring-2 focus:ring-[#1c5c43]/25 focus:border-[#1c5c43] transition-all"
+                      minLength={8}
+                      value={form.password}
+                      onChange={update("password")}
+                      placeholder="Kata sandi baru"
+                      className="pl-10 pr-11"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 text-[#8a958e] hover:text-[#0d3527] p-1 cursor-pointer"
-                      aria-label={
-                        showPassword ? "Sembunyikan sandi" : "Tampilkan sandi"
-                      }
+                      onClick={() => setShowPassword((value) => !value)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#8a958e] hover:text-[#0d3527]"
+                      aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
                     >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
+                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                     </button>
                   </div>
-                </div>
-
-                {/* Agreement Checkbox */}
-                <div className="pt-1.5">
-                  <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={agreed}
-                      onChange={(e) => setAgreed(e.target.checked)}
-                      className="sr-only"
+                </Field>
+                <Field label="Telepon">
+                  <div className="relative">
+                    <Phone className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#8a958e]" />
+                    <Input
+                      value={form.phone}
+                      onChange={update("phone")}
+                      placeholder="0812-xxxx-xxxx"
+                      className="pl-10"
                     />
-                    <div
-                      className={`w-4 h-4 rounded mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
-                        agreed
-                          ? "bg-[#1c5c43] text-white"
-                          : "border border-[#8a9890] bg-white"
-                      }`}
-                    >
-                      {agreed && (
-                        <svg
-                          viewBox="0 0 14 14"
-                          fill="none"
-                          className="w-3 h-3 stroke-white stroke-[2.5]"
-                        >
-                          <path d="M2.5 7L5.5 10L11.5 4" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="text-xs sm:text-[13px] text-[#40564b] leading-relaxed">
-                      Saya memahami bahwa informasi pangan diisi oleh penyedia
-                    </span>
-                  </label>
-                </div>
-
-                {/* Submit button */}
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="w-full mt-3 bg-[#1c5c43] hover:bg-[#154a36] active:scale-[0.99] text-white font-semibold text-sm sm:text-base py-3.5 px-6 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
-                >
-                  {isPending ? (
-                    <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <span>Buat akun</span>
-                  )}
-                </button>
-              </form>
-
-              {/* Bottom text */}
-              <div className="mt-6 text-center text-xs sm:text-sm text-[#526359]">
-                Sudah punya akun?{" "}
-                <Link
-                  href="/login"
-                  className="font-bold text-[#1c5c43] hover:underline"
-                >
-                  Masuk
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* ──────────────────────────────────────────────────────── */}
-          {/* COLUMN 3 (RIGHT): "LANGKAH SELANJUTNYA" CARD             */}
-          {/* ──────────────────────────────────────────────────────── */}
-          <div className="lg:col-span-4 xl:col-span-4 flex flex-col justify-between self-stretch">
-            <div className="bg-[#f5efe4] rounded-3xl p-6 sm:p-8 border border-[#e6decf]">
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[#0d3527] tracking-tight">
-                Langkah selanjutnya
-              </h2>
-              <p className="mt-1.5 text-xs sm:text-sm text-[#526359] leading-relaxed mb-7">
-                Proses pendaftaran mudah dan cepat. Ikuti 3 langkah berikut:
-              </p>
-
-              {/* Stepper with connector line */}
-              <div className="space-y-6 relative">
-                {/* Step 1 */}
-                <div className="flex items-start gap-3.5 relative">
-                  <div className="w-8 h-8 rounded-full bg-[#1c5c43] text-white font-bold text-sm flex items-center justify-center shrink-0 z-10 shadow-sm">
-                    1
                   </div>
-                  <div>
-                    <h3 className="font-bold text-sm sm:text-[15px] text-[#0d3527]">
-                      Lengkapi profil
-                    </h3>
-                    <p className="text-xs sm:text-[13px] text-[#526359] mt-0.5 leading-relaxed">
-                      Isi informasi diri dan organisasi Anda dengan lengkap.
-                    </p>
+                </Field>
+                <Field label="Area operasional">
+                  <div className="relative">
+                    <MapPin className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#8a958e]" />
+                    <Input
+                      value={form.area}
+                      onChange={update("area")}
+                      placeholder="Contoh: Tebet, Jakarta Selatan"
+                      className="pl-10"
+                    />
                   </div>
-                  {/* Dashed connector down */}
-                  <div className="absolute left-4 top-8 w-[1px] h-9 border-l border-dashed border-[#8ba596]" />
-                </div>
-
-                {/* Step 2 */}
-                <div className="flex items-start gap-3.5 relative">
-                  <div className="w-8 h-8 rounded-full bg-[#1c5c43] text-white font-bold text-sm flex items-center justify-center shrink-0 z-10 shadow-sm">
-                    2
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-sm sm:text-[15px] text-[#0d3527]">
-                      Tunggu persetujuan organisasi
-                    </h3>
-                    <p className="text-xs sm:text-[13px] text-[#526359] mt-0.5 leading-relaxed">
-                      Tim kami akan meninjau data Anda untuk memastikan keamanan
-                      dan kualitas platform.
-                    </p>
-                  </div>
-                  {/* Dashed connector down */}
-                  <div className="absolute left-4 top-8 w-[1px] h-9 border-l border-dashed border-[#8ba596]" />
-                </div>
-
-                {/* Step 3 */}
-                <div className="flex items-start gap-3.5 relative">
-                  <div className="w-8 h-8 rounded-full bg-[#1c5c43] text-white font-bold text-sm flex items-center justify-center shrink-0 z-10 shadow-sm">
-                    3
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-sm sm:text-[15px] text-[#0d3527]">
-                      Mulai catat atau klaim surplus
-                    </h3>
-                    <p className="text-xs sm:text-[13px] text-[#526359] mt-0.5 leading-relaxed">
-                      Setelah disetujui, Anda dapat mulai mencatat pangan berlebih
-                      atau melakukan reservasi.
-                    </p>
-                  </div>
+                </Field>
+                <div className="sm:col-span-2">
+                  <Field label="Alamat lengkap" hint="Dipakai sebagai lokasi pickup atau distribusi.">
+                    <Textarea
+                      value={form.address}
+                      onChange={update("address")}
+                      placeholder="Jalan, nomor, kelurahan, kota"
+                    />
+                  </Field>
                 </div>
               </div>
 
-              {/* Yellow Alert Box */}
-              <div className="mt-8 bg-[#fbeece]/90 border border-[#f0d8a8] rounded-2xl p-4 flex items-start gap-3">
-                <Info className="w-5 h-5 text-[#c2842e] shrink-0 mt-0.5" />
-                <p className="text-xs sm:text-[13px] text-[#714d18] leading-relaxed font-medium">
-                  Organisasi penerima perlu disetujui sebelum membuat reservasi.
-                </p>
-              </div>
-            </div>
-
-            {/* Bottom sprout note */}
-            <div className="mt-8 pt-2 flex items-center gap-3">
-              <div className="relative w-7 h-9 shrink-0">
-                <Image
-                  src="/assets/sprout-icon-transparent.png"
-                  alt="Bibit tanaman"
-                  fill
-                  className="object-contain mix-blend-multiply"
+              <label className="mt-4 flex items-start gap-3 text-xs leading-relaxed text-[#40564b]">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(event) => setAgreed(event.target.checked)}
+                  className="mt-0.5 size-4 accent-[#155c43]"
                 />
-              </div>
-              <p className="text-xs sm:text-[13px] text-[#526359] leading-tight">
-                Pangan hari ini,
-                <br />
-                masa depan yang lebih baik esok hari.
-              </p>
+                <span>
+                  Saya menyatakan data yang diisi benar dan memahami bahwa PANGANLOOP tidak
+                  mensertifikasi keamanan pangan. Verifikasi admin diperlukan sebelum transaksi.
+                </span>
+              </label>
+
+              <Button type="submit" disabled={submitting} className="mt-5 w-full">
+                {submitting ? "Mendaftarkan..." : "Daftar dan tunggu verifikasi"}
+                <ArrowRight className="size-4" />
+              </Button>
             </div>
-          </div>
+          </form>
+
+          <p className="mt-4 text-center text-xs text-[#5e6f64]">
+            Sudah punya akun?{" "}
+            <Link href="/login" className="font-semibold text-[#155c43] underline">
+              Masuk di sini
+            </Link>
+          </p>
         </div>
+
+        <aside className="space-y-4 lg:sticky lg:top-28 lg:self-start">
+          <div className="rounded-2xl border border-[#0d35271a] bg-[#fffdf8] p-5">
+            <h2 className="font-display text-lg font-semibold">Apa yang terjadi setelah daftar?</h2>
+            <ol className="mt-3 space-y-3 text-sm text-[#40564b]">
+              <li className="flex gap-2">
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#e6ecdd] text-[11px] font-bold text-[#155c43]">
+                  1
+                </span>
+                Akun tersimpan dengan status menunggu verifikasi.
+              </li>
+              <li className="flex gap-2">
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#e6ecdd] text-[11px] font-bold text-[#155c43]">
+                  2
+                </span>
+                Admin meninjau organisasi di panel admin.
+              </li>
+              <li className="flex gap-2">
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#e6ecdd] text-[11px] font-bold text-[#155c43]">
+                  3
+                </span>
+                Setelah disetujui, donor dapat mencatat batch dan penerima dapat mengklaim surplus.
+              </li>
+            </ol>
+          </div>
+          <div className="rounded-2xl border border-[#efd9a6] bg-[#fdf6e5] p-5 text-sm text-[#7a5410]">
+            <p className="flex items-center gap-2 font-semibold">
+              <ShieldCheck className="size-4" /> Mode demo
+            </p>
+            <p className="mt-1 text-xs leading-relaxed">
+              Pendaftaran tidak mengirim email. Data hanya tersimpan di browser ini dan dapat
+              direset dari dashboard.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-[#526359]">
+            <Leaf className="size-4 text-[#1c6b4f]" /> Lebih sedikit terbuang. Lebih banyak manfaat.
+          </div>
+        </aside>
       </main>
     </div>
   );

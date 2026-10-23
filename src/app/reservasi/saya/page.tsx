@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { ReservasiSayaView } from "../reservasi-saya-view";
+import { RecipientReservationsView } from "../../_components/reservation-views";
 
 export const metadata: Metadata = {
-  title: "Reservasi Saya — PANGANLOOP",
-  description:
-    "Detail reservasi pangan surplus untuk komunitas penerima, lengkap dengan QR code dan kode pickup serah terima.",
-  openGraph: {
-    title: "Reservasi Saya — PANGANLOOP",
-    description: "Detail reservasi pangan dan tiket pickup.",
-  },
+  title: "Reservasi saya — PANGANLOOP",
+  description: "Lihat kode pickup dan riwayat reservasi Anda.",
 };
 
-export default function ReservasiSayaPage() {
-  return <ReservasiSayaView />;
+export default function MyReservationsPage() {
+  return <RecipientReservationsView />;
 }

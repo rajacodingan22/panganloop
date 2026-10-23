@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Caveat, DM_Sans } from "next/font/google";
-import { AuthProvider } from "./_components/auth-context";
+import { PanganloopStoreProvider } from "./_components/store";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body
         className={`${display.variable} ${body.variable} ${hand.variable}`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <PanganloopStoreProvider>{children}</PanganloopStoreProvider>
       </body>
     </html>
   );

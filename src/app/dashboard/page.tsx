@@ -1,16 +1,17 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { DashboardView } from "./dashboard-view";
+import { DashboardClient } from "./dashboard-client";
+import { Spinner } from "../_components/ui-kit";
 
 export const metadata: Metadata = {
-  title: "Dashboard Pengelola Usaha — PANGANLOOP",
-  description:
-    "Pantau batch aktif, surplus pangan, reservasi pickup, dan laporan analitik Dapur Pagi di PANGANLOOP.",
-  openGraph: {
-    title: "Dashboard Pengelola Usaha — PANGANLOOP",
-    description: "Pantau batch aktif, surplus pangan, dan analitik di PANGANLOOP.",
-  },
+  title: "Dashboard — PANGANLOOP",
+  description: "Ringkasan surplus, batch, dan reservasi sesuai peran Anda.",
 };
 
 export default function DashboardPage() {
-  return <DashboardView />;
+  return (
+    <Suspense fallback={<Spinner />}>
+      <DashboardClient />
+    </Suspense>
+  );
 }
