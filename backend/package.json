@@ -1,0 +1,30 @@
+{
+  "name": "panganloop-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4000",
+    "build": "next build",
+    "start": "next start -p 4000",
+    "lint": "eslint",
+    "seed:admin": "node --env-file=.env.local scripts/seed-admin.mjs",
+    "seed:accounts": "node --env-file=.env.local scripts/seed-accounts.mjs",
+    "migrate:timestamps": "node --env-file=.env.local scripts/migrate-timestamps.mjs",
+    "seed:demo": "node --env-file=.env.local --import tsx scripts/seed-demo.ts"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.5.0",
+    "next": "16.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5"
+  }
+}

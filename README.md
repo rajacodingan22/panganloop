@@ -1,39 +1,58 @@
-# panganloop
+# PANGANLOOP
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+PANGANLOOP is split into two independent Next.js applications:
 
-## Getting Started
+- [`frontend/`](./frontend/README.md) — existing UI, development port `3000`.
+- [`backend/`](./backend/) — API, Firebase Authentication and Firestore, development port `4000`.
 
-First, run the development server:
+## Backend setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Rotate any Firebase service-account key or admin password that has been shared outside a
+   secret manager. Do not copy credentials from chat history into project files.
+2. Copy `backend/.env.example` to `backend/.env.local`. Set the newly rotated Firebase Admin
+   credentials, `FIREBASE_WEB_API_KEY`, and `FRONTEND_ORIGIN=http://localhost:3000`. Jika memakai
+   `npm run seed:admin`, isi juga `ADMIN_SEED_PASSWORD` minimal 12 karakter.
+3. In a terminal:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```powershell
+   cd backend
+   npm install
+   npm run seed:accounts
+   npm run dev
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   `npm run seed:accounts` membuat satu akun untuk tiap peran (donor, penerima, admin) langsung di
+   Firebase Authentication beserta profilnya di Firestore, lalu mencetak email dan kata sandinya di
+   terminal. Jalankan ulang kapan saja untuk mengatur ulang kata sandi akun tersebut. Langkah
+   `npm run seed:admin` bersifat opsional bila Anda ingin bootstrap admin terpisah.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   The server starts at `http://localhost:4000`. Check `GET /api/health`.
+4. In a second terminal, copy `frontend/.env.example` to `frontend/.env.local`, then run:
 
-## Learn More
+   ```powershell
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+   The frontend API URL should be `NEXT_PUBLIC_API_BASE_URL=http://localhost:4000`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Autentikasi
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Login dan register memakai **Firebase Authentication** (email + password). Server memanggil Firebase
+Identity Toolkit dengan `FIREBASE_WEB_API_KEY`, memverifikasi ID token lewat Firebase Admin, lalu
+menerbitkan session cookie httpOnly `__session` berumur 5 hari. Profil, peran, dan status verifikasi
+disimpan di koleksi Firestore `organizations/{uid}`; kata sandi tidak pernah disimpan di Firestore.
+Registrasi langsung membuat user Firebase dan dokumen organisasi berstatus `pending`.
 
-## Deploy on Vercel
+## API
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
+- `GET /api/organizations`, `PATCH /api/organizations`, `GET|DELETE /api/organizations/:id`
+- `GET|POST /api/batches`, `PATCH /api/batches`, `GET|DELETE /api/batches/:id`
+- `GET|POST /api/reservations`, `PATCH /api/reservations`, `GET /api/reservations/:id`
+- `GET /api/audit` (admin only)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# panganloop" 
+Protected mutations enforce the account role and record audit events. Reservation stock is
+checked transactionally in Firestore. Audit entries are append-only. Configure Firestore rules
+to deny direct client reads and writes; only the backend service account should access data.
